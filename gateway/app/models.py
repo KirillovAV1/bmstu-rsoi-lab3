@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional, Union
 from uuid import UUID
 from enum import Enum
 from datetime import date
@@ -58,18 +58,17 @@ class ReservationResponse(BaseModel):
     startDate: date
     endDate: date
     status: ReservationStatus
-    payment: PaymentInfo
+    payment: Optional[PaymentInfo] = None
 
 
 class LoyaltyInfoResponse(BaseModel):
     status: LoyaltyLevel
     discount: int
-    reservationCount: int | None = None
-
+    reservationCount: int
 
 class UserInfoResponse(BaseModel):
     reservations: List[ReservationResponse]
-    loyalty: LoyaltyInfoResponse
+    loyalty: LoyaltyInfoResponse | dict
 
 
 class CreateReservationRequest(BaseModel):
