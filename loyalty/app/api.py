@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Header, Body
+from .models import LoyaltyInfoResponse
 from .db import get_conn
 import psycopg2.extras
 
@@ -14,7 +15,7 @@ def health():
 def user_loyalty(x_user_name: str = Header(..., alias="X-User-Name")):
     with get_conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
         cur.execute("""
-            SELECT *
+            SELECT status, discount, reservation_count as "reservationCount"
             FROM loyalty
             WHERE username = %s;
         """, (x_user_name,))
@@ -23,14 +24,7 @@ def user_loyalty(x_user_name: str = Header(..., alias="X-User-Name")):
     if not row:
         return {}
 
-    loyalty = {
-        "status": row["status"],
-        "discount": row["discount"],
-        "reservationCount": row["reservation_count"]
-    }
-
-    return loyalty
-
+    return LoyaltyInfoResponse(**row)
 
 @router.patch("/api/v1/loyalty")
 def update_loyalty(
