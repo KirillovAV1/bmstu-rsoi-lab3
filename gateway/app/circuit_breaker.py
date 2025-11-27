@@ -23,6 +23,7 @@ class CircuitBreaker:
 
     def success_request(self):
         self.state = "CLOSED"
+        self.errors.clear()
 
     def failure_request(self):
         current = time.time()
@@ -86,7 +87,6 @@ def request_with_circuit_breaker(service: str, func, *args, **kwargs):
     try:
         result = func(*args, **kwargs)
     except Exception as e:
-
         if breaker.state == "HALF_OPEN":
             breaker.half_open_attempt(False)
         else:
